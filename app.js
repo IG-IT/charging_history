@@ -44,7 +44,7 @@
       startSoc:num(o.startSoc), endSoc:num(o.endSoc), energy:num(o.energy), minutes:num(o.minutes),
       peakPower:num(o.peakPower), cost:num(o.cost), rangeStart:num(o.rangeStart), rangeEnd:num(o.rangeEnd),
       odometer:num(o.odometer), notes:String(o.notes || '').trim(),
-      chargedSocHint:num(o.chargedSocHint), addedRangeHint:num(o.addedRangeHint)
+      chargedSocHint:num(o.chargedSocHint??o.chargedSoc), addedRangeHint:num(o.addedRangeHint??o.addedRange)
     });
   }
   function fromSwedishRow(r) {
@@ -182,7 +182,7 @@
     const fields={date:s?.date||new Date().toISOString().slice(0,10),location:s?.location||'',startSoc:s?.startSoc??'',endSoc:s?.endSoc??'',energy:s?.energy??'',minutes:s?.minutes??'',peakPower:s?.peakPower??'',cost:s?.cost??'',rangeStart:s?.rangeStart??'',rangeEnd:s?.rangeEnd??'',odometer:s?.odometer??'',notes:s?.notes||''};
     Object.entries(fields).forEach(([k,v])=>$(k).value=v); $('deleteBtn').hidden=!s; updateComputed(); $('editDialog').showModal();
   }
-  function formSession(){ return normalize({id:editingId||makeId(),date:$('date').value,location:$('location').value,startSoc:$('startSoc').value,endSoc:$('endSoc').value,energy:$('energy').value,minutes:$('minutes').value,peakPower:$('peakPower').value,cost:$('cost').value,rangeStart:$('rangeStart').value,rangeEnd:$('rangeEnd').value,odometer:$('odometer').value,notes:$('notes').value}); }
+  function formSession(){ const previous=editingId?sessions.find(x=>x.id===editingId):null; return normalize({id:editingId||makeId(),date:$('date').value,location:$('location').value,startSoc:$('startSoc').value,endSoc:$('endSoc').value,energy:$('energy').value,minutes:$('minutes').value,peakPower:$('peakPower').value,cost:$('cost').value,rangeStart:$('rangeStart').value,rangeEnd:$('rangeEnd').value,odometer:$('odometer').value,notes:$('notes').value,chargedSocHint:previous?.chargedSoc,addedRangeHint:previous?.addedRange}); }
   function updateComputed(){ const s=formSession(); $('computedPreview').innerHTML=`<div><span>Средняя мощность</span><b>${unit(s.avgPower,'kW',1)}</b></div><div><span>Цена энергии</span><b>${unit(s.avgPrice,'SEK/kWh',2)}</b></div><div><span>Добавлено</span><b>${unit(s.addedRange,'km',0)}</b></div><div><span>Стоимость / 100 km</span><b>${unit(s.cost100,'SEK',2)}</b></div>`; }
   function saveForm(e){ e.preventDefault(); const s=formSession(); if(!s.location){toast('Укажите место или сеть'); return;} const i=sessions.findIndex(x=>x.id===s.id); if(i>=0)sessions[i]=s; else sessions.push(s); persist(); render(); $('editDialog').close(); toast(i>=0?'Сессия обновлена':'Сессия добавлена'); }
   function deleteCurrent(){ if(!editingId)return; if(!confirm('Удалить эту зарядку?'))return; sessions=sessions.filter(s=>s.id!==editingId); persist(); render(); $('editDialog').close(); toast('Сессия удалена'); }
