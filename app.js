@@ -20,7 +20,7 @@
   function makeId() { return (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`); }
   function isoDate(v) {
     if (!v) return '';
-    if (v instanceof Date && !isNaN(v)) return v.toISOString().slice(0,10);
+    if (v instanceof Date && !isNaN(v)) return `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}-${String(v.getDate()).padStart(2,'0')}`;
     if (typeof v === 'number' && window.XLSX) {
       const d = XLSX.SSF.parse_date_code(v); if (d) return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;
     }
@@ -73,7 +73,12 @@
   }
 
   function persist() { localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions)); localStorage.setItem(DAILY_KEY,JSON.stringify(dailyEntries)); }
-  function loadLocal() { try { const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)); if (Array.isArray(raw)) sessions = raw.map(normalize); const daily=JSON.parse(localStorage.getItem(DAILY_KEY)); if(Array.isArray(daily))dailyEntries=daily.map(normalizeDaily); } catch {} }
+  function repairImportedDates(){
+    const replacements=new Map();
+    sessions.forEach(s=>{const m=s.notes.match(/(?:Start|Betald)\s+(\d{4}-\d{2}-\d{2})/i);if(!m||!s.date)return;const current=new Date(`${s.date}T12:00:00`),noted=new Date(`${m[1]}T12:00:00`);if(Math.abs(noted-current)===86400000)replacements.set(`${s.date}|${s.location}`,m[1]);});
+    let changed=false; sessions=sessions.map(s=>{const date=replacements.get(`${s.date}|${s.location}`);if(!date)return s;changed=true;return {...s,date};}); return changed;
+  }
+  function loadLocal() { try { const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)); if (Array.isArray(raw)) sessions = raw.map(normalize); const daily=JSON.parse(localStorage.getItem(DAILY_KEY)); if(Array.isArray(daily))dailyEntries=daily.map(normalizeDaily); if(repairImportedDates())persist(); } catch {} }
 
   function money(v) { return v == null ? '—' : `${v.toLocaleString('sv-SE',{minimumFractionDigits:2,maximumFractionDigits:2})} SEK`; }
   function unit(v,u,d=1) { return v == null ? '—' : `${v.toLocaleString('sv-SE',{maximumFractionDigits:d})} ${u}`; }
@@ -132,8 +137,8 @@
   }
   function analyticsFor(items,daily=[]) {
     const total=k=>items.reduce((a,s)=>a+(Number(s[k])||0),0);
-    const cost=total('cost'), energy=total('energy'), range=total('addedRange'), distance=daily.reduce((a,x)=>a+(x.distance||0),0);
-    return {cost,energy,range,distance,avgPrice:energy?cost/energy:null,cost100:range?cost/range*100:null};
+    const cost=total('cost'), energy=total('energy'), range=total('addedRange'), distance=daily.reduce((a,x)=>a+(x.distance||0),0), distanceDays=daily.filter(x=>x.distance!=null).length;
+    return {cost,energy,range,distance,distanceDays,dailyRows:daily.length,avgPrice:energy?cost/energy:null,cost100:range?cost/range*100:null};
   }
   function renderAnalytics() {
     const period=$('periodSelect').value, items=sessionsForPeriod(period), a=analyticsFor(items,dailyForPeriod(period));
@@ -143,7 +148,8 @@
     $('periodEnergy').textContent=unit(a.energy,'kWh',1);
     $('periodAvgPrice').textContent=unit(a.avgPrice,'SEK/kWh',2);
     $('periodCost100').textContent=unit(a.cost100,'SEK',2);
-    $('periodSessions').textContent=items.length?`${items.length} ${plural(items.length,'зарядка','зарядки','зарядок')} · заряжено +${unit(a.range,'km',0)}${a.distance?` · проехано (по логу) ${unit(a.distance,'km',0)}`:''}`:'Нет зарядок за период';
+    $('periodSessions').textContent=items.length?`${items.length} ${plural(items.length,'зарядка','зарядки','зарядок')} · добавленный запас +${unit(a.range,'km',0)}`:'Нет зарядок за период';
+    $('periodCoverage').textContent=a.dailyRows?`Дневной лог неполный: записано ${unit(a.distance,'km',0)} за ${a.distanceDays} из ${a.dailyRows} дней с данными. Это не полный пробег за период.`:'Фактический пробег за этот период пока не внесён.';
     const comparison=$('monthComparison'); comparison.className=''; comparison.textContent='';
     if(period==='month') {
       const previous=analyticsFor(sessionsForPeriod('previous-month'),dailyForPeriod('previous-month'));
@@ -156,9 +162,9 @@
   }
   function renderDaily(){
     const rows=dailyEntries.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-    const sum=k=>rows.reduce((a,x)=>a+(Number(x[k])||0),0), distance=sum('distance'), energy=sum('totalEnergy'), parking=sum('parking');
-    $('dailyCount').textContent=`${rows.length} ${plural(rows.length,'день','дня','дней')}`;
-    $('dailySummary').innerHTML=`<div><span>Пробег</span><b>${unit(distance,'km',1)}</b></div><div><span>Расход</span><b>${distance?unit(energy/distance*100,'kWh/100 km',1):'—'}</b></div><div><span>Всего энергии</span><b>${unit(energy,'kWh',1)}</b></div><div><span>На парковке</span><b>${unit(parking,'kWh',1)}</b></div>`;
+    const sum=k=>rows.reduce((a,x)=>a+(Number(x[k])||0),0), distance=sum('distance'), energy=sum('totalEnergy'), driving=sum('driving'), parking=sum('parking'), distanceDays=rows.filter(x=>x.distance!=null).length;
+    $('dailyCount').textContent=`${distanceDays}/${rows.length} дней`;
+    $('dailySummary').innerHTML=`<div><span>Пробег по логу</span><b>${unit(distance,'km',1)}</b></div><div><span>Расход в движении</span><b>${distance?unit(driving/distance*100,'kWh/100 km',1):'—'}</b></div><div><span>Всего энергии</span><b>${unit(energy,'kWh',1)}</b></div><div><span>На парковке</span><b>${unit(parking,'kWh',1)}</b></div>`;
     $('dailyList').innerHTML=rows.length?rows.map(x=>`<article class="daily-row"><div class="daily-row-head"><span>${esc(dateLabel(x.date))}</span><span>${esc(unit(x.distance,'km',1))}</span></div><div class="daily-row-metrics"><span>⚡ ${esc(unit(x.totalEnergy,'kWh',1))}</span><span>Средний расход ${esc(unit(x.consumption,'kWh/100 km',1))}</span><span>Скорость ${esc(unit(x.avgSpeed,'km/h',1))}</span><span>Парковка ${esc(unit(x.parking,'kWh',1))}</span><span>Рекуперация ${esc(unit(x.regen,'kWh',1))}</span><span>A/C ${esc(unit(x.ac,'kWh',1))}</span></div></article>`).join(''):'<p class="muted">Дневных данных пока нет. Импортируйте обновлённый Excel.</p>';
   }
   function markBackup(){localStorage.setItem(BACKUP_KEY,new Date().toISOString());renderBackupReminder();}
@@ -237,6 +243,9 @@
   $('exportBtn').addEventListener('click',()=>$('exportDialog').showModal()); $('closeExportBtn').addEventListener('click',()=>$('exportDialog').close()); document.querySelectorAll('[data-export]').forEach(b=>b.addEventListener('click',()=>exportData(b.dataset.export)));
   $('resetBtn').addEventListener('click',resetData);
   $('backupNowBtn').addEventListener('click',backupNow);
+  $('settingsBtn').addEventListener('click',()=>{const menu=$('settingsMenu'),open=menu.hidden;menu.hidden=!open;$('settingsBtn').setAttribute('aria-expanded',String(open));});
+  $('settingsMenu').addEventListener('click',e=>{if(e.target.closest('button')){$('settingsMenu').hidden=true;$('settingsBtn').setAttribute('aria-expanded','false');}});
+  document.addEventListener('click',e=>{if(!e.target.closest('.header-buttons')){$('settingsMenu').hidden=true;$('settingsBtn').setAttribute('aria-expanded','false');}});
 
   loadLocal(); render();
   if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(console.warn));

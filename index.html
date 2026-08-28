@@ -17,11 +17,31 @@
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <div>
-        <p class="eyebrow">XPENG G9 · CHARGE LOG</p>
-        <h1>Зарядки</h1>
+      <div class="topbar-row">
+        <div>
+          <p class="eyebrow">XPENG G9 · CHARGE LOG</p>
+          <h1>Зарядки</h1>
+        </div>
+
+
+        <div class="header-buttons">
+            <label class="search-wrap top-search">
+            <span>⌕</span>
+            <input id="searchInput" type="search" placeholder="Поиск по месту или заметкам" autocomplete="off" />
+          </label>
+          <button id="addBtn" class="icon-btn primary" aria-label="Добавить зарядку">＋</button>
+          <button id="settingsBtn" class="icon-btn settings-btn" aria-label="Импорт, экспорт и настройки" aria-expanded="false" aria-controls="settingsMenu">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.6 2.6h4.8l.6 2.2c.5.2 1 .5 1.5.9l2.2-.7 2.4 4.1-1.7 1.5a8 8 0 0 1 0 1.8l1.7 1.5-2.4 4.1-2.2-.7c-.5.4-1 .7-1.5.9l-.6 2.2H9.6L9 18.2c-.6-.2-1.1-.5-1.5-.9l-2.2.7-2.4-4.1 1.7-1.5a8 8 0 0 1 0-1.8L2.9 9.1 5.3 5l2.2.7c.4-.4.9-.7 1.5-.9l.6-2.2Zm2.4 5.8a3.6 3.6 0 1 0 0 7.2 3.6 3.6 0 0 0 0-7.2Z"/></svg>
+          </button>
+          <div id="settingsMenu" class="settings-menu" hidden>
+            <div class="toolbar-actions">
+              <button id="importBtn" class="soft-btn">Импорт</button>
+              <button id="exportBtn" class="soft-btn">Экспорт</button>
+              <button id="resetBtn" class="soft-btn danger-text">Backup + сброс</button>
+            </div>
+          </div>
+        </div>
       </div>
-      <button id="addBtn" class="icon-btn primary" aria-label="Добавить зарядку">＋</button>
     </header>
 
     <main>
@@ -38,18 +58,6 @@
           <div><span>Средняя цена</span><b id="avgPrice">—</b></div>
           <div><span>Средняя мощность</span><b id="avgPower">—</b></div>
           <div><span>Добавлено км</span><b id="totalRange">—</b></div>
-        </div>
-      </section>
-
-      <section class="toolbar-card">
-        <label class="search-wrap">
-          <span>⌕</span>
-          <input id="searchInput" type="search" placeholder="Поиск по месту или заметкам" autocomplete="off" />
-        </label>
-        <div class="toolbar-actions">
-          <button id="importBtn" class="soft-btn">Импорт</button>
-          <button id="exportBtn" class="soft-btn">Экспорт</button>
-          <button id="resetBtn" class="soft-btn danger-text">Backup + сброс</button>
         </div>
       </section>
 
@@ -70,12 +78,13 @@
           <div><span>Потрачено</span><b id="periodCost">—</b></div>
           <div><span>Заряжено</span><b id="periodEnergy">—</b></div>
           <div><span>Цена энергии</span><b id="periodAvgPrice">—</b></div>
-          <div class="featured-metric"><span>Стоимость / 100 km пробега</span><b id="periodCost100">—</b></div>
+          <div class="featured-metric"><span>Цена / 100 km добавленного запаса</span><b id="periodCost100">—</b></div>
         </div>
         <div class="analytics-foot">
           <span id="periodSessions">Нет зарядок</span>
           <span id="monthComparison"></span>
         </div>
+        <p id="periodCoverage" class="analytics-note"></p>
       </section>
 
       <section id="backupReminder" class="backup-reminder" hidden>
