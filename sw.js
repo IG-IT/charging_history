@@ -1,4 +1,4 @@
-const CACHE='g9-charge-v12';
+const CACHE='g9-charge-v14';
 // No personal data file here on purpose — the repo ships code only, data is imported
 // client-side via the app's own Import button. Precaching a data/ path that doesn't
 // exist on the hosted site would fail cache.addAll() and break the whole install.

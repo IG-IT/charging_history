@@ -38,6 +38,10 @@
               <button id="importBtn" class="soft-btn">Импорт</button>
               <button id="exportBtn" class="soft-btn">Экспорт</button>
               <button id="resetBtn" class="soft-btn danger-text">Backup + сброс</button>
+              <div id="backupReminder" class="settings-backup" hidden>
+                <div><b>Резервная копия</b><span id="backupReminderText">Сохраните данные в Files или iCloud Drive.</span></div>
+                <button id="backupNowBtn" class="soft-btn">Создать</button>
+              </div>
             </div>
           </div>
         </div>
@@ -85,11 +89,6 @@
           <span id="monthComparison"></span>
         </div>
         <p id="periodCoverage" class="analytics-note"></p>
-      </section>
-
-      <section id="backupReminder" class="backup-reminder" hidden>
-        <div><b>Резервная копия</b><span id="backupReminderText">Сохраните данные в Files или iCloud Drive.</span></div>
-        <button id="backupNowBtn" class="soft-btn">Создать</button>
       </section>
 
       <section class="daily-card">
