@@ -1,0 +1,15 @@
+{
+  "name": "XPENG G9 Charge Log",
+  "short_name": "G9 Charge",
+  "description": "Мобильный журнал зарядок XPENG G9",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#07111f",
+  "theme_color": "#07111f",
+  "orientation": "portrait-primary",
+  "icons": [
+    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"},
+    {"src":"apple-touch-icon.png","sizes":"180x180","type":"image/png","purpose":"any"}
+  ]
+}

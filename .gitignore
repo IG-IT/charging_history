@@ -1,0 +1,12 @@
+# Personal charging data, receipts and screenshots — never pushed to GitHub.
+# Deploy the app code only; import your own data client-side after hosting
+# (see README "Данные и приватность"). Everything below stays local.
+data/
+
+# Prebuilt personal install bundle (also contains data/ snapshot)
+XPENG-G9-Charge-Log-iPhone.zip
+
+# Misc
+*.heic
+*.HEIC
+.DS_Store

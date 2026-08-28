@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover,interactive-widget=resizes-content" />
+  <meta name="theme-color" content="#07111f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="G9 Charge" />
+  <meta name="description" content="Мобильный журнал зарядок XPENG G9 с импортом и экспортом XLSX, CSV и JSON." />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>G9 Charge Log</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">XPENG G9 · CHARGE LOG</p>
+        <h1>Зарядки</h1>
+      </div>
+      <button id="addBtn" class="icon-btn primary" aria-label="Добавить зарядку">＋</button>
+    </header>
+
+    <main>
+      <section class="hero-card">
+        <div class="hero-head">
+          <div>
+            <span class="muted">Всего потрачено</span>
+            <strong id="totalCost" class="hero-value">—</strong>
+          </div>
+          <div class="hero-chip" id="sessionCount">0 сессий</div>
+        </div>
+        <div class="hero-grid">
+          <div><span>Энергия</span><b id="totalEnergy">—</b></div>
+          <div><span>Средняя цена</span><b id="avgPrice">—</b></div>
+          <div><span>Средняя мощность</span><b id="avgPower">—</b></div>
+          <div><span>Добавлено км</span><b id="totalRange">—</b></div>
+        </div>
+      </section>
+
+      <section class="toolbar-card">
+        <label class="search-wrap">
+          <span>⌕</span>
+          <input id="searchInput" type="search" placeholder="Поиск по месту или заметкам" autocomplete="off" />
+        </label>
+        <div class="toolbar-actions">
+          <button id="importBtn" class="soft-btn">Импорт</button>
+          <button id="exportBtn" class="soft-btn">Экспорт</button>
+          <button id="resetBtn" class="soft-btn danger-text">Backup + сброс</button>
+        </div>
+      </section>
+
+      <section class="analytics-card">
+        <div class="analytics-head">
+          <div>
+            <p class="eyebrow">АНАЛИТИКА</p>
+            <h2 id="analyticsTitle">Текущий месяц</h2>
+          </div>
+          <select id="periodSelect" aria-label="Период аналитики">
+            <option value="month">Этот месяц</option>
+            <option value="previous-month">Прошлый месяц</option>
+            <option value="year">Этот год</option>
+            <option value="all">Всё время</option>
+          </select>
+        </div>
+        <div class="analytics-grid">
+          <div><span>Потрачено</span><b id="periodCost">—</b></div>
+          <div><span>Заряжено</span><b id="periodEnergy">—</b></div>
+          <div><span>Цена энергии</span><b id="periodAvgPrice">—</b></div>
+          <div class="featured-metric"><span>Стоимость / 100 km пробега</span><b id="periodCost100">—</b></div>
+        </div>
+        <div class="analytics-foot">
+          <span id="periodSessions">Нет зарядок</span>
+          <span id="monthComparison"></span>
+        </div>
+      </section>
+
+      <section id="backupReminder" class="backup-reminder" hidden>
+        <div><b>Резервная копия</b><span id="backupReminderText">Сохраните данные в Files или iCloud Drive.</span></div>
+        <button id="backupNowBtn" class="soft-btn">Создать</button>
+      </section>
+
+      <section class="daily-card">
+        <div class="analytics-head">
+          <div><p class="eyebrow">ЭНЕРГОПОТРЕБЛЕНИЕ</p><h2>По дням</h2></div>
+          <span id="dailyCount" class="hero-chip">0 дней</span>
+        </div>
+        <div id="dailySummary" class="daily-summary"></div>
+        <div id="dailyList" class="daily-list"></div>
+      </section>
+
+      <section class="section-head">
+        <div>
+          <h2>История</h2>
+          <p id="listMeta">Локально на этом устройстве</p>
+        </div>
+        <select id="sortSelect" aria-label="Сортировка">
+          <option value="date-desc">Сначала новые</option>
+          <option value="date-asc">Сначала старые</option>
+          <option value="cost-desc">По стоимости</option>
+          <option value="energy-desc">По энергии</option>
+        </select>
+      </section>
+
+      <section id="sessionList" class="session-list" aria-live="polite"></section>
+      <div id="emptyState" class="empty-state" hidden>
+        <div class="empty-icon">⚡</div>
+        <h3>Зарядок пока нет</h3>
+        <p>Добавьте сессию вручную или импортируйте XLSX / CSV / JSON.</p>
+        <button class="primary-btn" id="emptyAddBtn">Добавить зарядку</button>
+      </div>
+    </main>
+  </div>
+
+  <input id="fileInput" type="file" accept=".xlsx,.xls,.csv,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/json" hidden />
+
+  <dialog id="editDialog">
+    <form id="sessionForm" method="dialog">
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">СЕССИЯ</p>
+          <h2 id="dialogTitle">Новая зарядка</h2>
+        </div>
+        <button type="button" class="icon-btn" id="closeDialogBtn" aria-label="Закрыть">×</button>
+      </div>
+      <input type="hidden" id="sessionId" />
+      <div class="form-grid">
+        <label>Дата<input id="date" type="date" required /></label>
+        <label class="span-2">Место / сеть<input id="location" type="text" placeholder="Tesla Supercharger Nacka" required /></label>
+        <label>Start SOC, %<input id="startSoc" type="number" min="0" max="100" step="1" inputmode="decimal" /></label>
+        <label>End SOC, %<input id="endSoc" type="number" min="0" max="100" step="1" inputmode="decimal" /></label>
+        <label>Энергия, kWh<input id="energy" type="number" min="0" step="0.001" inputmode="decimal" /></label>
+        <label>Время, min<input id="minutes" type="number" min="0" step="0.01" inputmode="decimal" /></label>
+        <label>Пиковая мощность, kW<input id="peakPower" type="number" min="0" step="0.1" inputmode="decimal" /></label>
+        <label>Стоимость, SEK<input id="cost" type="number" min="0" step="0.01" inputmode="decimal" /></label>
+        <label>Запас хода до, km<input id="rangeStart" type="number" min="0" step="1" inputmode="decimal" /></label>
+        <label>Запас хода после, km<input id="rangeEnd" type="number" min="0" step="1" inputmode="decimal" /></label>
+        <label>Одометр, km<input id="odometer" type="number" min="0" step="1" inputmode="decimal" /></label>
+        <label class="span-2">Заметки<textarea id="notes" rows="4" placeholder="Тариф, температура, прогрев батареи…"></textarea></label>
+      </div>
+      <div class="computed-preview" id="computedPreview"></div>
+      <div class="dialog-actions">
+        <button type="button" id="deleteBtn" class="danger-btn" hidden>Удалить</button>
+        <button type="submit" class="primary-btn">Сохранить</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="exportDialog" class="compact-dialog">
+    <div class="dialog-head">
+      <div><p class="eyebrow">ЭКСПОРТ</p><h2>Выберите формат</h2></div>
+      <button type="button" class="icon-btn" id="closeExportBtn">×</button>
+    </div>
+    <div class="export-options">
+      <button data-export="xlsx"><b>XLSX</b><span>Совместимо с вашим Excel-журналом</span></button>
+      <button data-export="csv"><b>CSV</b><span>Универсальная таблица UTF-8</span></button>
+      <button data-export="json"><b>JSON</b><span>Полная резервная копия приложения</span></button>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <script src="vendor/xlsx.full.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
