@@ -31,7 +31,7 @@
   function calc(s) {
     const chargedSoc = s.startSoc != null && s.endSoc != null ? s.endSoc - s.startSoc : (s.chargedSocHint ?? null);
     const avgPower = s.energy != null && s.minutes ? s.energy / s.minutes * 60 : null;
-    const avgPrice = s.energy ? s.cost / s.energy : null;
+    const avgPrice = s.energy && s.cost != null ? s.cost / s.energy : null;
     const addedRange = s.rangeStart != null && s.rangeEnd != null ? s.rangeEnd - s.rangeStart : (s.addedRangeHint ?? null);
     const cost100 = s.cost != null && addedRange ? s.cost / addedRange * 100 : null;
     const energyPerSoc = s.energy != null && chargedSoc ? s.energy / chargedSoc : null;
@@ -66,6 +66,10 @@
       rangeStart:g('rangestart','räckvidd start (km)','запас хода до, km'), rangeEnd:g('rangeend','räckvidd slut (km)','запас хода после, km'),
       odometer:g('odometer','mätarställning (km)','одометр, km'), notes:g('notes','anteckningar','заметки')
     });
+  }
+
+  function sessionKey(s) {
+    return JSON.stringify([s.date,String(s.location||'').trim().toLowerCase(),s.startSoc,s.endSoc,s.energy,s.minutes,s.peakPower,s.cost,s.rangeStart,s.rangeEnd,s.odometer,String(s.notes||'').trim()]);
   }
 
   function normalizeDaily(r) {
@@ -213,8 +217,11 @@
       else if(ext==='csv'){ const text=await file.text(); if(window.XLSX){ const wb=XLSX.read(text,{type:'string'}); incoming=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:null}).map(r=>r['Plats / nätverk']!==undefined?fromSwedishRow(r):fromGenericRow(r)); } else { throw new Error('XLSX library unavailable for CSV parser'); } }
       else { if(!window.XLSX)throw new Error('XLSX library unavailable'); const wb=XLSX.read(await file.arrayBuffer(),{cellDates:true}); const ws=wb.Sheets['Laddningslogg']||wb.Sheets[wb.SheetNames[0]]; incoming=XLSX.utils.sheet_to_json(ws,{defval:null,raw:true}).map(r=>r['Plats / nätverk']!==undefined?fromSwedishRow(r):fromGenericRow(r)); if(wb.Sheets['Daglig energiförbrukning'])incomingDaily=XLSX.utils.sheet_to_json(wb.Sheets['Daglig energiförbrukning'],{defval:null,raw:true}).map(normalizeDaily); }
       incoming=incoming.filter(s=>s.date||s.location||s.energy!=null); incomingDaily=incomingDaily.filter(x=>x.date); if(!incoming.length&&!incomingDaily.length)throw new Error('No rows found');
-      if(sessions.length && !confirm(`Импортировать ${incoming.length} строк?\n\nOK — добавить к текущим данным.\nОтмена — не импортировать.`)) return;
-      sessions=[...sessions,...incoming]; const byDate=new Map(dailyEntries.map(x=>[x.date,x])); incomingDaily.forEach(x=>byDate.set(x.date,x)); dailyEntries=[...byDate.values()]; persist(); render(); toast(`Импортировано: ${incoming.length} зарядок, ${incomingDaily.length} дней`);
+      const known=new Set(sessions.map(sessionKey)), uniqueIncoming=[]; let duplicateCount=0;
+      incoming.forEach(s=>{const key=sessionKey(s);if(known.has(key)){duplicateCount++;return;}known.add(key);uniqueIncoming.push(s);});
+      if(sessions.length && (uniqueIncoming.length||incomingDaily.length) && !confirm(`Добавить ${uniqueIncoming.length} новых зарядок и обновить ${incomingDaily.length} дней?${duplicateCount?`\n\nДубликаты пропущены: ${duplicateCount}.`:''}`)) return;
+      sessions=[...sessions,...uniqueIncoming]; const byDate=new Map(dailyEntries.map(x=>[x.date,x])); incomingDaily.forEach(x=>byDate.set(x.date,x)); dailyEntries=[...byDate.values()]; persist(); render();
+      toast(uniqueIncoming.length||incomingDaily.length?`Импортировано: ${uniqueIncoming.length} зарядок, ${incomingDaily.length} дней${duplicateCount?`; пропущено ${duplicateCount}`:''}`:`Новых данных нет — ${duplicateCount} дубликатов пропущено`);
     } catch(e){ console.error(e); alert(`Не удалось импортировать файл.\n${e.message}`); } finally { $('fileInput').value=''; } }
 
   async function resetData(){
