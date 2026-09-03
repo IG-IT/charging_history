@@ -1,44 +1,48 @@
-# XPENG G9 Charge Log — GitHub Pages PWA
+# Charge Log — GitHub Pages PWA
 
-Мобильный веб‑журнал зарядок XPENG G9, адаптированный в том числе под экран iPhone 14 Pro Max (430 × 932), Dynamic Island и safe areas. Работает как статический сайт без backend: данные хранятся только в `localStorage` браузера. Репозиторий содержит только код приложения — никаких личных данных (чеков, скриншотов, Excel с зарядками) в нём нет и не будет: свой журнал вы загружаете сами через кнопку **Импорт** после открытия сайта, данные никогда не попадают в GitHub.
+Mobil webbloggbok för laddningar av din elbil, anpassad bland annat för iPhone 14 Pro Max (430 × 932), Dynamic Island och safe areas. Fungerar som en statisk webbplats utan backend: all data sparas enbart i webbläsarens `localStorage`. Repot innehåller bara appens kod — inga personliga data (kvitton, skärmdumpar, Excel med laddningar) finns eller kommer att finnas här: du laddar upp din egen logg via knappen **Importera** efter att du öppnat sajten, och datan hamnar aldrig i GitHub.
 
-## Возможности
+## Funktioner
 
-- мобильный интерфейс и установка на домашний экран как PWA;
-- добавление, редактирование, удаление и поиск зарядных сессий;
-- автоматический расчёт: заряженный SOC, средняя мощность, цена за kWh, добавленный запас хода, стоимость / 100 km, kWh / 1% SOC;
-- аналитика за текущий/прошлый месяц, текущий год и всё время со сравнением месячных расходов;
-- дневная статистика XPENG: пробег, расход, скорость, рекуперация, парковка и A/C (если такие данные импортированы);
-- стоимость / 100 km считается по добавленному запасу хода из самих зарядных сессий — эта величина всегда охватывает тот же период, что и потраченные деньги; реальный дневной пробег (если он импортирован) показывается отдельной справочной цифрой;
-- импорт XLSX / CSV / JSON — единственный способ загрузить свои данные, репозиторий их не содержит;
-- экспорт XLSX / CSV / JSON;
-- безопасный сброс: перед удалением локальных данных приложение обязательно скачивает полные копии JSON и XLSX;
-- напоминание о резервной копии каждые 30 дней;
-- без сервера и базы данных — подходит для GitHub Pages.
+- mobilanpassat gränssnitt och installation på hemskärmen som PWA;
+- lägg till, redigera, ta bort och sök bland laddsessioner;
+- eget fordonsnamn: byt namn under **Fordon** i inställningsmenyn — det används i rubriken samt i filnamn och rubriker vid export (standard: "XPENG G9");
+- inbyggd hjälp: en **Hjälp & vanliga frågor**-dialog i inställningsmenyn förklarar fälten, import/export och var datan sparas;
+- automatiska beräkningar: laddad SOC, snitteffekt, pris per kWh, tillagd räckvidd, kostnad / 100 km, kWh / 1 % SOC;
+- analys för denna/förra månaden, i år och alla tider, med jämförelse mot föregående månads kostnad;
+- daglig statistik: körsträcka, förbrukning, hastighet, regenerering, parkering och A/C (om sådan data importerats);
+- kostnad / 100 km räknas på tillagd räckvidd från själva laddsessionerna — detta täcker alltid samma period som pengarna som spenderats; den faktiska dagliga körsträckan (om importerad) visas separat som referens;
+- import av XLSX / CSV / JSON — enda sättet att lägga in egna data, repot innehåller inga;
+- export av XLSX / CSV / JSON;
+- säker återställning: innan lokal data raderas laddar appen alltid ner fullständiga kopior i JSON och XLSX;
+- påminnelse om säkerhetskopia var 30:e dag;
+- inget server- eller databasberoende — passar för GitHub Pages.
 
-## Публикация на GitHub Pages
+## Publicera på GitHub Pages
 
-1. Создайте новый GitHub‑репозиторий, например `xpeng-g9-charge-log`.
-2. Загрузите в корень репозитория все файлы и папки из этого проекта.
-3. Откройте **Settings → Pages**.
-4. В **Build and deployment** выберите **Deploy from a branch**.
-5. Branch: `main`, folder: `/ (root)`, затем **Save**.
-6. Через GitHub Pages откройте опубликованный адрес. На iPhone/Android можно добавить сайт на главный экран.
-7. Нажмите **Импорт** и выберите свой файл (XLSX / CSV / JSON) — он останется только в `localStorage` вашего браузера/устройства и никуда не отправится. Файл с реальными данными в этот репозиторий не коммитьте — папка `data/` уже в `.gitignore`.
+1. Skapa ett nytt GitHub-repo, till exempel `charge-log`.
+2. Ladda upp alla filer och mappar från det här projektet till repots rot.
+3. Öppna **Settings → Pages**.
+4. Under **Build and deployment**, välj **Deploy from a branch**.
+5. Branch: `main`, folder: `/ (root)`, klicka sedan **Save**.
+6. Öppna den publicerade adressen via GitHub Pages. På iPhone/Android går det att lägga till sajten på hemskärmen.
+7. Tryck på **Importera** och välj din fil (XLSX / CSV / JSON) — den stannar bara i webbläsarens/enhetens `localStorage` och skickas ingenstans. Committa aldrig en fil med riktig data till repot — mappen `data/` finns redan i `.gitignore`.
 
-## Установка на iPhone 14 Pro Max
+## Installation på iPhone 14 Pro Max
 
-1. Откройте адрес GitHub Pages именно в Safari.
-2. Нажмите кнопку **Поделиться** внизу экрана.
-3. Выберите **На экран «Домой»** → **Добавить**.
-4. Запускайте приложение с домашнего экрана — оно откроется без интерфейса Safari, как обычное приложение.
+1. Öppna GitHub Pages-adressen i just Safari.
+2. Tryck på **Dela**-knappen längst ner på skärmen.
+3. Välj **Lägg till på hemskärmen** → **Lägg till**.
+4. Starta appen från hemskärmen — den öppnas utan Safaris gränssnitt, som en vanlig app.
 
-Интерфейс учитывает верхнюю область Dynamic Island и нижний Home Indicator. Поля имеют размер, при котором iOS не увеличивает страницу при вводе.
+Gränssnittet tar hänsyn till det övre området med Dynamic Island och den nedre Home Indicator. Fälten är dimensionerade så att iOS inte zoomar in sidan vid inmatning.
 
-## XLSX и офлайн-работа
+## XLSX och offlineläge
 
-SheetJS CE 0.20.3 хранится локально в `vendor/xlsx.full.min.js` и кэшируется PWA вместе с приложением. После первого открытия GitHub Pages импорт и экспорт XLSX работают без подключения к интернету.
+SheetJS CE 0.20.3 finns lokalt i `vendor/xlsx.full.min.js` och cachas av PWA:n tillsammans med appen. Efter första öppningen på GitHub Pages fungerar import och export av XLSX utan internetuppkoppling.
 
-## Данные и приватность
+## Data och integritet
 
-Репозиторий на GitHub содержит только код приложения. Личные данные (Excel с зарядками, чеки, скриншоты) никогда не коммитятся — папка `data/` и файл `XPENG-G9-Charge-Log-iPhone.zip` перечислены в `.gitignore`. Свой журнал вы загружаете сами через **Импорт** после открытия опубликованного сайта; после этого данные сохраняются только в `localStorage` текущего браузера/устройства и не отправляются на GitHub или какой‑либо сервер. Для резервной копии регулярно используйте Export → JSON или XLSX.
+GitHub-repot innehåller bara appens kod. Personliga data (Excel med laddningar, kvitton, skärmdumpar) committas aldrig — mappen `data/` och filen `XPENG-G9-Charge-Log-iPhone.zip` finns listade i `.gitignore`. Du laddar själv upp din logg via **Importera** efter att ha öppnat den publicerade sajten; därefter sparas datan enbart i den aktuella webbläsarens/enhetens `localStorage` och skickas varken till GitHub eller någon annan server. Använd Exportera → JSON eller XLSX regelbundet för säkerhetskopiering.
+
+Vill du se om någon besöker sajten kan du använda GitHub:s inbyggda **Insights → Traffic** för repot — den kräver ingen kodändring och skickar ingen data till tredje part.

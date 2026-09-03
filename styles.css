@@ -36,6 +36,10 @@ main { width:100%; min-width:0; }
 .settings-btn svg { width:22px; height:22px; fill:currentColor; display:block; margin:auto; }
 .settings-menu { position:absolute; z-index:15; top:52px; right:0; width:240px; padding:8px; border:1px solid var(--line); border-radius:18px; background:rgba(17,34,53,.98); box-shadow:0 18px 55px rgba(0,0,0,.48); backdrop-filter:blur(18px); }
 .settings-menu[hidden] { display:none; }
+.settings-vehicle { display:flex; flex-direction:column; gap:4px; padding:2px 4px 10px; margin-bottom:8px; border-bottom:1px solid var(--line); }
+.settings-vehicle span { color:var(--muted); font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+.settings-vehicle input { height:38px; padding:0 11px; color:var(--text); background:#081522; border:1px solid var(--line); border-radius:11px; outline:none; }
+.settings-vehicle input:focus { border-color:rgba(105,240,200,.45); box-shadow:0 0 0 3px rgba(105,240,200,.08); }
 .settings-menu .toolbar-actions { display:grid; grid-template-columns:1fr; gap:7px; margin:0; }
 .settings-menu .soft-btn { min-height:44px; text-align:left; padding:0 13px; }
 .settings-backup { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:9px; margin-top:3px; padding:10px 4px 2px; border-top:1px solid var(--line); }
@@ -136,6 +140,11 @@ dialog::backdrop { background:rgba(2,8,14,.73); backdrop-filter:blur(9px); }
 .export-options button { display:flex; flex-direction:column; align-items:flex-start; gap:2px; padding:15px; border:1px solid var(--line); border-radius:16px; color:var(--text); background:rgba(255,255,255,.035); text-align:left; }
 .export-options b { color:var(--accent); }
 .export-options span { color:var(--muted); font-size:12px; }
+.help-content { display:grid; gap:16px; }
+.help-section h3 { margin:0 0 6px; color:var(--accent); font-size:13px; }
+.help-section p { margin:0; color:var(--muted); font-size:13px; line-height:1.5; }
+.help-section ul { margin:6px 0 0; padding-left:18px; color:var(--muted); font-size:13px; line-height:1.5; display:grid; gap:3px; }
+.help-section b { color:var(--text); }
 .toast { position:fixed; z-index:20; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); transform:translate(-50%,20px); padding:11px 14px; border-radius:14px; color:#08231d; background:var(--accent); font-weight:800; font-size:12px; opacity:0; pointer-events:none; transition:.25s ease; box-shadow:0 12px 36px #0006; }
 .toast.show { opacity:1; transform:translate(-50%,0); }
 @media (max-width: 480px) {

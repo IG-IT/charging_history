@@ -1,7 +1,7 @@
 {
   "name": "XPENG G9 Charge Log",
   "short_name": "G9 Charge",
-  "description": "Мобильный журнал зарядок XPENG G9",
+  "description": "Mobil laddningslogg för XPENG G9",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

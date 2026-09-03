@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="sv">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover,interactive-widget=resizes-content" />
@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="G9 Charge" />
-  <meta name="description" content="Мобильный журнал зарядок XPENG G9 с импортом и экспортом XLSX, CSV и JSON." />
+  <meta name="description" content="Mobil laddningslogg för XPENG G9 med import och export av XLSX, CSV och JSON." />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -19,28 +19,33 @@
     <header class="topbar">
       <div class="topbar-row">
         <div>
-          <p class="eyebrow">XPENG G9 · CHARGE LOG</p>
-          <h1>Зарядки</h1>
+          <p class="eyebrow" id="vehicleEyebrow">XPENG G9 · CHARGE LOG</p>
+          <h1>Laddningar</h1>
         </div>
 
 
         <div class="header-buttons">
             <label class="search-wrap top-search">
             <span>⌕</span>
-            <input id="searchInput" type="search" placeholder="Поиск по месту или заметкам" autocomplete="off" />
+            <input id="searchInput" type="search" placeholder="Sök efter plats eller anteckningar" autocomplete="off" />
           </label>
-          <button id="addBtn" class="icon-btn primary" aria-label="Добавить зарядку">＋</button>
-          <button id="settingsBtn" class="icon-btn settings-btn" aria-label="Импорт, экспорт и настройки" aria-expanded="false" aria-controls="settingsMenu">
+          <button id="addBtn" class="icon-btn primary" aria-label="Lägg till laddning">＋</button>
+          <button id="settingsBtn" class="icon-btn settings-btn" aria-label="Import, export och inställningar" aria-expanded="false" aria-controls="settingsMenu">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.6 2.6h4.8l.6 2.2c.5.2 1 .5 1.5.9l2.2-.7 2.4 4.1-1.7 1.5a8 8 0 0 1 0 1.8l1.7 1.5-2.4 4.1-2.2-.7c-.5.4-1 .7-1.5.9l-.6 2.2H9.6L9 18.2c-.6-.2-1.1-.5-1.5-.9l-2.2.7-2.4-4.1 1.7-1.5a8 8 0 0 1 0-1.8L2.9 9.1 5.3 5l2.2.7c.4-.4.9-.7 1.5-.9l.6-2.2Zm2.4 5.8a3.6 3.6 0 1 0 0 7.2 3.6 3.6 0 0 0 0-7.2Z"/></svg>
           </button>
           <div id="settingsMenu" class="settings-menu" hidden>
+            <label class="settings-vehicle">
+              <span>Fordon</span>
+              <input id="vehicleNameInput" type="text" placeholder="XPENG G9" maxlength="60" autocomplete="off" />
+            </label>
             <div class="toolbar-actions">
-              <button id="importBtn" class="soft-btn">Импорт</button>
-              <button id="exportBtn" class="soft-btn">Экспорт</button>
-              <button id="resetBtn" class="soft-btn danger-text">Backup + сброс</button>
+              <button id="helpBtn" class="soft-btn">Hjälp &amp; vanliga frågor</button>
+              <button id="importBtn" class="soft-btn">Importera</button>
+              <button id="exportBtn" class="soft-btn">Exportera</button>
+              <button id="resetBtn" class="soft-btn danger-text">Backup + återställ</button>
               <div id="backupReminder" class="settings-backup" hidden>
-                <div><b>Резервная копия</b><span id="backupReminderText">Сохраните данные в Files или iCloud Drive.</span></div>
-                <button id="backupNowBtn" class="soft-btn">Создать</button>
+                <div><b>Säkerhetskopia</b><span id="backupReminderText">Spara data i Filer eller iCloud Drive.</span></div>
+                <button id="backupNowBtn" class="soft-btn">Skapa</button>
               </div>
             </div>
           </div>
@@ -52,40 +57,40 @@
       <section class="hero-card">
         <div class="hero-head">
           <div>
-            <span class="muted">Всего потрачено</span>
+            <span class="muted">Totalt spenderat</span>
             <strong id="totalCost" class="hero-value">—</strong>
           </div>
-          <div class="hero-chip" id="sessionCount">0 сессий</div>
+          <div class="hero-chip" id="sessionCount">0 sessioner</div>
         </div>
         <div class="hero-grid">
-          <div><span>Энергия</span><b id="totalEnergy">—</b></div>
-          <div><span>Средняя цена</span><b id="avgPrice">—</b></div>
-          <div><span>Средняя мощность</span><b id="avgPower">—</b></div>
-          <div><span>Добавлено км</span><b id="totalRange">—</b></div>
+          <div><span>Energi</span><b id="totalEnergy">—</b></div>
+          <div><span>Snittpris</span><b id="avgPrice">—</b></div>
+          <div><span>Snitteffekt</span><b id="avgPower">—</b></div>
+          <div><span>Tillagd räckvidd</span><b id="totalRange">—</b></div>
         </div>
       </section>
 
       <section class="analytics-card">
         <div class="analytics-head">
           <div>
-            <p class="eyebrow">АНАЛИТИКА</p>
-            <h2 id="analyticsTitle">Текущий месяц</h2>
+            <p class="eyebrow">ANALYS</p>
+            <h2 id="analyticsTitle">Denna månad</h2>
           </div>
-          <select id="periodSelect" aria-label="Период аналитики">
-            <option value="month">Этот месяц</option>
-            <option value="previous-month">Прошлый месяц</option>
-            <option value="year">Этот год</option>
-            <option value="all">Всё время</option>
+          <select id="periodSelect" aria-label="Analysperiod">
+            <option value="month">Denna månad</option>
+            <option value="previous-month">Förra månaden</option>
+            <option value="year">Detta år</option>
+            <option value="all">Alla tider</option>
           </select>
         </div>
         <div class="analytics-grid">
-          <div><span>Потрачено</span><b id="periodCost">—</b></div>
-          <div><span>Заряжено</span><b id="periodEnergy">—</b></div>
-          <div><span>Цена энергии</span><b id="periodAvgPrice">—</b></div>
-          <div class="featured-metric"><span>Цена / 100 km добавленного запаса</span><b id="periodCost100">—</b></div>
+          <div><span>Spenderat</span><b id="periodCost">—</b></div>
+          <div><span>Laddat</span><b id="periodEnergy">—</b></div>
+          <div><span>Energipris</span><b id="periodAvgPrice">—</b></div>
+          <div class="featured-metric"><span>Pris / 100 km tillagd räckvidd</span><b id="periodCost100">—</b></div>
         </div>
         <div class="analytics-foot">
-          <span id="periodSessions">Нет зарядок</span>
+          <span id="periodSessions">Inga laddningar</span>
           <span id="monthComparison"></span>
         </div>
         <p id="periodCoverage" class="analytics-note"></p>
@@ -93,8 +98,8 @@
 
       <section class="daily-card">
         <div class="analytics-head">
-          <div><p class="eyebrow">ЭНЕРГОПОТРЕБЛЕНИЕ</p><h2>По дням</h2></div>
-          <span id="dailyCount" class="hero-chip">0 дней</span>
+          <div><p class="eyebrow">ENERGIFÖRBRUKNING</p><h2>Per dag</h2></div>
+          <span id="dailyCount" class="hero-chip">0 dagar</span>
         </div>
         <div id="dailySummary" class="daily-summary"></div>
         <div id="dailyList" class="daily-list"></div>
@@ -102,23 +107,23 @@
 
       <section class="section-head">
         <div>
-          <h2>История</h2>
-          <p id="listMeta">Локально на этом устройстве</p>
+          <h2>Historik</h2>
+          <p id="listMeta">Lokalt på denna enhet</p>
         </div>
-        <select id="sortSelect" aria-label="Сортировка">
-          <option value="date-desc">Сначала новые</option>
-          <option value="date-asc">Сначала старые</option>
-          <option value="cost-desc">По стоимости</option>
-          <option value="energy-desc">По энергии</option>
+        <select id="sortSelect" aria-label="Sortering">
+          <option value="date-desc">Nyast först</option>
+          <option value="date-asc">Äldst först</option>
+          <option value="cost-desc">Efter kostnad</option>
+          <option value="energy-desc">Efter energi</option>
         </select>
       </section>
 
       <section id="sessionList" class="session-list" aria-live="polite"></section>
       <div id="emptyState" class="empty-state" hidden>
         <div class="empty-icon">⚡</div>
-        <h3>Зарядок пока нет</h3>
-        <p>Добавьте сессию вручную или импортируйте XLSX / CSV / JSON.</p>
-        <button class="primary-btn" id="emptyAddBtn">Добавить зарядку</button>
+        <h3>Inga laddningar än</h3>
+        <p>Lägg till en session manuellt eller importera XLSX / CSV / JSON.</p>
+        <button class="primary-btn" id="emptyAddBtn">Lägg till laddning</button>
       </div>
     </main>
   </div>
@@ -129,43 +134,88 @@
     <form id="sessionForm" method="dialog">
       <div class="dialog-head">
         <div>
-          <p class="eyebrow">СЕССИЯ</p>
-          <h2 id="dialogTitle">Новая зарядка</h2>
+          <p class="eyebrow">SESSION</p>
+          <h2 id="dialogTitle">Ny laddning</h2>
         </div>
-        <button type="button" class="icon-btn" id="closeDialogBtn" aria-label="Закрыть">×</button>
+        <button type="button" class="icon-btn" id="closeDialogBtn" aria-label="Stäng">×</button>
       </div>
       <input type="hidden" id="sessionId" />
       <div class="form-grid">
-        <label>Дата<input id="date" type="date" required /></label>
-        <label class="span-2">Место / сеть<input id="location" type="text" placeholder="Tesla Supercharger Nacka" required /></label>
+        <label>Datum<input id="date" type="date" required /></label>
+        <label class="span-2">Plats / nätverk<input id="location" type="text" placeholder="Tesla Supercharger Nacka" required /></label>
         <label>Start SOC, %<input id="startSoc" type="number" min="0" max="100" step="1" inputmode="decimal" /></label>
         <label>End SOC, %<input id="endSoc" type="number" min="0" max="100" step="1" inputmode="decimal" /></label>
-        <label>Энергия, kWh<input id="energy" type="number" min="0" step="0.001" inputmode="decimal" /></label>
-        <label>Время, min<input id="minutes" type="number" min="0" step="0.01" inputmode="decimal" /></label>
-        <label>Пиковая мощность, kW<input id="peakPower" type="number" min="0" step="0.1" inputmode="decimal" /></label>
-        <label>Стоимость, SEK<input id="cost" type="number" min="0" step="0.01" inputmode="decimal" /></label>
-        <label>Запас хода до, km<input id="rangeStart" type="number" min="0" step="1" inputmode="decimal" /></label>
-        <label>Запас хода после, km<input id="rangeEnd" type="number" min="0" step="1" inputmode="decimal" /></label>
-        <label>Одометр, km<input id="odometer" type="number" min="0" step="1" inputmode="decimal" /></label>
-        <label class="span-2">Заметки<textarea id="notes" rows="4" placeholder="Тариф, температура, прогрев батареи…"></textarea></label>
+        <label>Energi, kWh<input id="energy" type="number" min="0" step="0.001" inputmode="decimal" /></label>
+        <label>Tid, min<input id="minutes" type="number" min="0" step="0.01" inputmode="decimal" /></label>
+        <label>Toppeffekt, kW<input id="peakPower" type="number" min="0" step="0.1" inputmode="decimal" /></label>
+        <label>Kostnad, SEK<input id="cost" type="number" min="0" step="0.01" inputmode="decimal" /></label>
+        <label>Räckvidd före, km<input id="rangeStart" type="number" min="0" step="1" inputmode="decimal" /></label>
+        <label>Räckvidd efter, km<input id="rangeEnd" type="number" min="0" step="1" inputmode="decimal" /></label>
+        <label>Mätarställning, km<input id="odometer" type="number" min="0" step="1" inputmode="decimal" /></label>
+        <label class="span-2">Anteckningar<textarea id="notes" rows="4" placeholder="Taxa, temperatur, förvärmning av batteri…"></textarea></label>
       </div>
       <div class="computed-preview" id="computedPreview"></div>
       <div class="dialog-actions">
-        <button type="button" id="deleteBtn" class="danger-btn" hidden>Удалить</button>
-        <button type="submit" class="primary-btn">Сохранить</button>
+        <button type="button" id="deleteBtn" class="danger-btn" hidden>Ta bort</button>
+        <button type="submit" class="primary-btn">Spara</button>
       </div>
     </form>
   </dialog>
 
   <dialog id="exportDialog" class="compact-dialog">
     <div class="dialog-head">
-      <div><p class="eyebrow">ЭКСПОРТ</p><h2>Выберите формат</h2></div>
+      <div><p class="eyebrow">EXPORT</p><h2>Välj format</h2></div>
       <button type="button" class="icon-btn" id="closeExportBtn">×</button>
     </div>
     <div class="export-options">
-      <button data-export="xlsx"><b>XLSX</b><span>Совместимо с вашим Excel-журналом</span></button>
-      <button data-export="csv"><b>CSV</b><span>Универсальная таблица UTF-8</span></button>
-      <button data-export="json"><b>JSON</b><span>Полная резервная копия приложения</span></button>
+      <button data-export="xlsx"><b>XLSX</b><span>Kompatibel med din Excel-logg</span></button>
+      <button data-export="csv"><b>CSV</b><span>Universell UTF-8-tabell</span></button>
+      <button data-export="json"><b>JSON</b><span>Fullständig säkerhetskopia av appen</span></button>
+    </div>
+  </dialog>
+
+  <dialog id="helpDialog">
+    <div class="dialog-head">
+      <div><p class="eyebrow">HJÄLP</p><h2>Hjälp &amp; vanliga frågor</h2></div>
+      <button type="button" class="icon-btn" id="closeHelpBtn" aria-label="Stäng">×</button>
+    </div>
+    <div class="help-content">
+      <div class="help-section">
+        <h3>Om appen</h3>
+        <p id="helpVehicleText">Det här är din privata laddningslogg för XPENG G9. All data sparas lokalt i webbläsaren på den här enheten – inget skickas till någon server.</p>
+        <p>Byt fordonsnamn under <b>Fordon</b> högst upp i inställningsmenyn (kugghjulet) – namnet sparas på enheten och används i rubriken samt i filnamn och rubriker när du exporterar.</p>
+      </div>
+      <div class="help-section">
+        <h3>Lägg till en laddning</h3>
+        <p>Tryck på ＋-knappen och fyll i formuläret. Endast <b>Datum</b> och <b>Plats / nätverk</b> krävs – lämna resten tomt om du inte har uppgifterna.</p>
+        <ul>
+          <li><b>Start/End SOC (%)</b> – batteriets laddningsnivå före och efter laddningen.</li>
+          <li><b>Energi (kWh)</b> – hur mycket energi som laddades.</li>
+          <li><b>Toppeffekt (kW)</b> – högsta laddeffekten under sessionen.</li>
+          <li><b>Räckvidd före/efter (km)</b> – bilens uppskattade räckvidd innan och efter laddningen.</li>
+        </ul>
+        <p>Snitteffekt, energipris och kostnad per 100 km räknas ut automatiskt utifrån det du fyller i.</p>
+      </div>
+      <div class="help-section">
+        <h3>Sök, sortera och analysera</h3>
+        <p>Använd sökfältet högst upp för att hitta laddningar efter plats eller anteckning. Sortera historiken efter datum, kostnad eller energi via listan längre ner. Analyskortet visar statistik för vald period – denna månad, förra månaden, i år eller alla tider.</p>
+      </div>
+      <div class="help-section">
+        <h3>Importera data</h3>
+        <p>Öppna inställningsmenyn (kugghjulet) och välj <b>Importera</b> för att lägga till laddningar från en XLSX-, CSV- eller JSON-fil. Dubbletter känns igen automatiskt och hoppas över.</p>
+      </div>
+      <div class="help-section">
+        <h3>Exportera &amp; säkerhetskopiera</h3>
+        <p>Under <b>Exportera</b> kan du spara din data som XLSX, CSV eller JSON när som helst. Eftersom all data bara finns lokalt på den här enheten bör du säkerhetskopiera då och då – appen påminner dig om det gått mer än 30 dagar sedan senaste kopian.</p>
+      </div>
+      <div class="help-section">
+        <h3>Backup + återställ</h3>
+        <p>Den här knappen skapar först en fullständig säkerhetskopia (JSON och Excel) och låter dig sedan radera all lokal data, efter en bekräftelse. Använd den bara om du vill börja om från noll.</p>
+      </div>
+      <div class="help-section">
+        <h3>Var sparas datan?</h3>
+        <p>Allt lagras lokalt i webbläsaren på just den här enheten. Byter du enhet eller rensar webbläsardata försvinner historiken – importera då en tidigare exporterad fil för att få tillbaka den.</p>
+      </div>
     </div>
   </dialog>
 
